@@ -1,0 +1,26 @@
+﻿variable,concept,2015,2018,rename_to,note
+sex,gender,ba000_w2_3,ba000_w2_3,sex,两期同码 1/2（码本 p5/p5）
+birth_year,birth year,ba004_w3_1,ba004_w3_1,birth_year,年龄=调查年-出生年；两期无现成 age 变量
+education,education level,bd001_w2_4,bd001_w2_4,education_raw,⚠ 编码不同：2015 有 12 无 11；2018 有 11 无 12 → 重编码
+marital,marital status,be001,be001,marital_raw,⚠ 2015 有 7=同居；2018 无 → 重编码
+hukou,hukou type,bc002_w3_1,bc002_w3_1,hukou,1 农业非农/统一/无 4 类 ✓
+srh,self-rated health,da002,da002,srh,5 级（锚点错位一级，实质同量表）
+chronic_count,chronic diseases count,da007_1_–da007_14_,da007_1_–da007_14_,chronic_n,2018 标签含病名（8=中风;12=记忆）;2015 按序对应
+stroke,stroke,da007_8_,da007_8_,stroke_w,即 da007s8
+smoke_ever,ever smoked,da059,da059,smoke_ever,⚠ 2015=当前是否吸; 2018=是否曾吸 → 统一口径见字典 §3
+drink,alcohol freq,da067,da067,drink,1 每月≥1次/2 更少/3 不喝
+adl_any,ADL limitation,db010–db015,db010–db015,adl_n,⚠ 在 db 段；1–4 编码两期一致
+iadl_any,IADL limitation,db017–db019,db017–db019,iadl_n,✓
+cesd_items,CESD-10,dc009–dc018,dc009–dc018,cesd_n,⚠ 2018 有 8=DK/9=Refused → 置 NaN
+recall_imm,immediate word recall,dc006s1–s12,dc028_w4_s1–s12,recall_imm_raw,⚠ 词表/编码全变；2018 只取第一试次 → Wu crosswalk
+recall_del,delayed word recall,dc027s1–s12,dc047_w4_s1–s12,recall_del_raw,同上
+orient,orientation,dc001s*,dc001_w4 等,r2orient 等,→ 用 Harmonized CHARLS D.2 的 r?orient
+ser7,serial 7s,dc019–dc023,dc014_w4_*,r2ser7 等,→ 用 Harmonized 的 r?ser7
+draw,figure drawing,dc025,dc024_w4,r2draw 等,→ 用 Harmonized 的 r?draw
+pain_src,pain screener,da041,da041_w4,pain_flag_src,⚠ 2015 是/否；2018 五级（1=None 触发=≥2）
+acu,acupuncture dummy,da042_w2_1s3,da042_w2_1_s3,acu_w,⚠ 2015 无下划线；2018 有 → 统一 acu_w
+tcm,herbal medicine,da042_w2_1s1,da042_w2_1_s1,tcm_w,背景对照
+wm,western medicine,da042_w2_1s2,da042_w2_1_s2,wm_w,背景对照
+massage,massage,da042_w2_1s4,da042_w2_1_s4,massage_w,背景对照
+pain_sites,pain sites,da042s1–s16,da042_s1–s16,painsites_n,2018 带 0 No 基线
+social,activities,da056s1–s10,da056_s1–s10,social_n,社交（非 ADL）；可作辅助协变量

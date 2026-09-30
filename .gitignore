@@ -1,0 +1,8 @@
+# CHARLS data and derived outputs must NOT be shared (data use agreement)
+data_raw/
+data_out/
+*.dta
+*.pkl
+__pycache__/
+*.pyc
+.DS_Store
