@@ -10,7 +10,7 @@
 - 基线：每人首次进面板波次；教育跨波解析（bd001_w2_4==12 为『未变化』，按
   Harmonized 惯例取该人任一波次的实测教育；2018 波无 12，天然兜底）。
 - 主模型 LMM：cog_total ~ time*acu_w + 基线协变量 + (1|ID)，time=year_since_baseline。
-- 所有输出为关联性数字，无因果措辞（行文由 team-lead 负责）。
+- 所有输出为关联性数字，无因果措辞（行文由 analysis lead 负责）。
 """
 import json
 import math
