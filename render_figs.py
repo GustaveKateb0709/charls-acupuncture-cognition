@@ -127,12 +127,11 @@ tau = t4.tau.values
 mean_, p10, p90 = np.mean(tau), np.percentile(tau, 10), np.percentile(tau, 90)
 fig, ax = plt.subplots(figsize=(115*MM, 88*MM))
 ax.hist(tau, bins=60, color=C1, alpha=0.85, edgecolor="white", lw=0.3)
-ax.axvline(mean_, color=C2, lw=1.6)
+ax.set_ylim(0, np.histogram(tau, bins=60)[0].max() * 1.32)   # 顶部净空带
+ax.axvline(mean_, color=C2, lw=1.6, ymax=0.82)   # 线在 82% 高度截断，标签悬浮于其上
 ax.axvline(p10, color=CG, lw=1.0, ls="--"); ax.axvline(p90, color=CG, lw=1.0, ls="--")
-ax.set_ylim(0, np.histogram(tau, bins=60)[0].max() * 1.28)   # 顶部净空带，标签悬于柱外
-ax.annotate(f"mean = {mean_:.3f}", xy=(mean_, 1), xycoords=("data", "axes fraction"),
-            xytext=(-10, -16), textcoords="offset points", ha="right",
-            color="#b3581e", fontsize=8.5)
+ax.annotate(f"mean = {mean_:.3f}", xy=(mean_, 0.84), xycoords=("data", "axes fraction"),
+            ha="center", va="bottom", color="#b3581e", fontsize=8.5)
 ax.annotate(f"p10 = {p10:.3f}", xy=(p10, 0.97), xycoords=("data", "axes fraction"),
             xytext=(-6, -14), textcoords="offset points", ha="right", color="#5a6e8c", fontsize=8)
 ax.annotate(f"p90 = {p90:.3f}", xy=(p90, 0.97), xycoords=("data", "axes fraction"),
