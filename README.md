@@ -18,6 +18,11 @@ Python code implementing the pre-locked statistical analysis plan (SAP v1.2):
   balance diagnostics, E-value for unmeasured confounding, and pre-specified sensitivity analyses.
 - `03_heterogeneity.py` — exploratory causal-forest estimates of individual-level effects (CATE) with SHAP summaries.
 - `04_figures.py` — publication figures (TIFF 600 dpi + PDF + PNG).
+- `05_w6_followup.py` — Tier-2 long-term follow-up layer (Wave 6): anchored on the 2013
+  baseline cohort, links acupuncture exposure history accumulated in the pain-reporting
+  waves (2013–2018) to the Wave 6 word-recall outcome (`xscorewr`), with hard frequency
+  gates that abort before model fitting on any mismatch, and an inverse-probability-of-censoring
+  sensitivity analysis.
 - `config/rename_map.csv` — cross-wave variable-name mapping verified against the CHARLS codebooks.
 
 ## Data
@@ -37,6 +42,32 @@ data_raw/
 The word-recall crosswalk table (`eqt_crosswalk_table.xlsx`) is downloaded from the
 official repository of Wu et al. (2024): https://github.com/Yingyan-Wu/charls_memory_equating
 (place it in `data_raw/crosswalk/`).
+
+## Wave 6 long-term follow-up layer (Tier-2)
+
+`05_w6_followup.py` implements the second tier of the two-tier design: it re-anchors on
+the 2013 baseline cohort and tests whether acupuncture exposure accumulated during the
+2013–2018 pain waves predicts word recall measured in CHARLS Wave 6. Wave 6 is one survey
+round fielded across 2021–2023; each respondent is assigned to exactly one year via
+`res_wave` in the 2023 `Sample_Infor` file, and the three releases are never stacked as
+three time points. Because the Wave 6 word list is new and has no official equating, the
+outcome is analysed on the within-Wave-6 scale only.
+
+To run it, additionally place the Wave 6 releases under `data_raw/`:
+
+```
+data_raw/
+├── W6_2021/CHARLS-W6-2021/  (Sample_Infor.dta, Health_Status_and_Functioning.dta, Cognition_Depression.dta)
+├── W6_2022/CHARLS-W6-2022/  (same files)
+└── W6_2023/CHARLS-W6-2023/  (same files)
+```
+
+The script requires the analysis panel built by `01_harmonize.py` (`data_out/analysis_panel.pkl`)
+and writes `data_out/flow_w6.json`, `data_out/results_summary_w6.json` and
+`data_out/w6_followup_sample.csv`. Hard-coded frequency gates (wave roster, exposure counts,
+minimum cognitive coverage) are checked before any model is fitted; the script aborts on any
+mismatch. Results quoted in the associated paper for this layer can only be reproduced by
+re-running this script on the licensed CHARLS Wave 6 data.
 
 ## Requirements
 
