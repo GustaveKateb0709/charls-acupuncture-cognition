@@ -7,9 +7,17 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from PIL import Image
 
-PKG = "/Users/wangtianyu/Desktop/25_2026.9.26_针灸神经康复SCI（期刊待定）"
-D = os.path.join(PKG, "04_Code_and_Data", "data_out")
-OUT = os.path.join(PKG, "02_Figures")
+BASE = os.path.dirname(os.path.abspath(__file__))
+# Paths resolve from the script location. In the manuscript package the script sits in
+# 04_Code_and_Data/ (data_out alongside it, figures at the package root); in the public
+# repository it sits at the repository root, where data_raw/, data_out/ and 02_Figures/
+# are expected.
+if os.path.basename(BASE) == "04_Code_and_Data":
+    D = os.path.join(BASE, "data_out")
+    OUT = os.path.join(os.path.dirname(BASE), "02_Figures")
+else:
+    D = os.path.join(BASE, "data_out")
+    OUT = os.path.join(BASE, "02_Figures")
 flow = json.load(open(os.path.join(D, "flow.json")))
 
 # Set2 低饱和
@@ -67,12 +75,12 @@ arrow(bx + bw/2, 84, 77)
 arrow(bx + bw/2, 64, 57)
 arrow(bx + bw/2, 44, 37)
 arrow(bx + bw/2, 24, 17)
-box(ex, 70, 40, 11, f"Excluded:\nno pain report (n = {n_panel - n_pain:,})", fs=7.5)
-box(ex, 50, 40, 11, f"Excluded:\n<2 cognitive waves (n = {n_pain - n_cog:,})", fs=7.5)
-box(ex, 30, 40, 11, f"Excluded:\nage < 45 (n = {n_cog - n_inc:,})", fs=7.5)
-arrow(bx + bw, 75.5, 75.5, x1=ex)
-arrow(bx + bw, 55.5, 55.5, x1=ex)
-arrow(bx + bw, 35.5, 35.5, x1=ex)
+box(ex, 65, 40, 11, f"Excluded:\nno pain report (n = {n_panel - n_pain:,})", fs=7.5)
+box(ex, 45, 40, 11, f"Excluded:\n<2 cognitive waves (n = {n_pain - n_cog:,})", fs=7.5)
+box(ex, 25, 40, 11, f"Excluded:\nage < 45 (n = {n_cog - n_inc:,})", fs=7.5)
+arrow(bx + bw, 70.5, 70.5, x1=ex)
+arrow(bx + bw, 50.5, 50.5, x1=ex)
+arrow(bx + bw, 30.5, 30.5, x1=ex)
 fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 save3(fig, "fig1_cohort_flow")
 
@@ -100,25 +108,45 @@ order = ["LMM main", "sens1_drop2013", "sens3_pattern2015_18",
 t3["k"] = t3.model.map({m: i for i, m in enumerate(order)})
 t3 = t3.sort_values("k", ascending=False).reset_index(drop=True)
 lab = {"LMM main": "Main LMM (time × acupuncture)",
+       "iptw_gee": "IPTW model (GEE)",
        "sens1_drop2013": "S1: excluding 2013 wave",
        "sens3_pattern2015_18": "S3: 2015+2018 pattern (occasional)",
        "sens4_tcm": "S4: exposure = TCM use",
        "sens4_massage": "S4: exposure = massage use",
        "sens5_surv2018": "S5: survivors to 2018",
        "sens2_MI_m10": "S2: multiple imputation (m = 10)"}
+# 固定行序：主模型 → IPTW → S1…S5（避免依赖 CSV 行序）
+ORDER = ["LMM main", "iptw_gee", "sens1_drop2013", "sens2_MI_m10",
+         "sens3_pattern2015_18", "sens4_tcm", "sens4_massage", "sens5_surv2018"]
+have = set(t3.model)
+t3 = t3.set_index("model").loc[[m for m in ORDER if m in have]].reset_index()
+
 fig, ax = plt.subplots(figsize=(140*MM, 88*MM))
-for i, r in t3.iterrows():
+for i, r in enumerate(t3.itertuples()):
     c = C2 if r.model == "LMM main" else CG
     ax.plot([r.ci_lo, r.ci_hi], [i, i], color=c, lw=1.6, solid_capstyle="butt")
     ax.plot(r.beta, i, "o", color=c, ms=5, mec="white", mew=0.6, zorder=3)
 ax.axvline(0, color="#4d4d4d", lw=0.8, ls="--")
+# 纵轴标签折两行：左半边的宽度让给绘图区
+LAB2 = {"LMM main": "Main LMM\n(time × acupuncture)",
+        "iptw_gee": "IPTW model\n(GEE)",
+        "sens1_drop2013": "S1:\nexcluding 2013 wave",
+        "sens2_MI_m10": "S2: multiple imputation\n(m = 10)",
+        "sens3_pattern2015_18": "S3: 2015+2018 pattern\n(occasional)",
+        "sens4_tcm": "S4: exposure =\nTCM use",
+        "sens4_massage": "S4: exposure =\nmessage use".replace("message", "massage"),
+        "sens5_surv2018": "S5:\nsurvivors to 2018"}
 ax.set_yticks(range(len(t3)))
-ax.set_yticklabels([lab[m] for m in t3.model])
-ax.set_xlabel("Interaction coefficient β (time × exposure)")
+ax.set_yticklabels([LAB2[m] for m in t3.model], linespacing=1.25)
 ax.set_ylim(-0.6, len(t3) - 0.4)
+ax.invert_yaxis()
 ax.spines[["top", "right", "left"]].set_visible(False)
 ax.tick_params(axis="y", length=0)
 fig.tight_layout(pad=0.6)
+fig.subplots_adjust(bottom=0.19)
+ax.set_xlabel("Interaction coefficient β (time × exposure)")
+_pos = ax.get_position()                      # 让轴标题水平居中于整幅图，而不是居中于坐标区
+ax.xaxis.set_label_coords((0.5 - _pos.x0) / _pos.width, -0.125)
 save3(fig, "fig3_forest")
 
 # ---------------- Fig 4 CATE 分布 ----------------
